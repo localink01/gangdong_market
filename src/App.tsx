@@ -21,12 +21,13 @@ import { StoreAdminDashboard } from "./screens/StoreAdminDashboard";
 import { appIcons } from "./icons";
 
 function NotificationsScreen() {
+  const { openStore } = useApp();
   const notifications = [
-    { id: 1, type: "event", title: "봄맞이 이벤트 시작!", body: "고덕2동 골목형상점가 봄맞이 이벤트가 시작됐어요. 참여 점포를 확인해보세요.", time: "방금 전", unread: true },
-    { id: 2, type: "stamp", title: "스탬프 2개 적립 완료", body: "고덕 한의원에서 스탬프가 적립됐어요. 10개 모으면 경품을 드려요!", time: "1시간 전", unread: true },
-    { id: 3, type: "dangol", title: "단골 가게 새 소식", body: "고덕 떡볶이 단골 소식: '오늘 재료 소진 시 조기 마감합니다'", time: "3시간 전", unread: false },
-    { id: 4, type: "coupon", title: "쿠폰 만료 3일 전", body: "고덕2동 신규 가입 쿠폰이 3일 후 만료돼요. 지금 바로 사용해보세요.", time: "어제", unread: false },
-    { id: 5, type: "event", title: "멤버 전용 할인 행사", body: "이번 주말 멤버 전용 10% 할인 행사가 진행돼요. 멤버십 배지를 보여주세요.", time: "2일 전", unread: false },
+    { id: 1, type: "event", title: "봄맞이 이벤트 시작!", body: "고덕 베이커리 봄맞이 이벤트가 시작됐어요. 참여 혜택을 확인해보세요.", time: "방금 전", unread: true, storeId: "godeok-bakery" },
+    { id: 2, type: "stamp", title: "스탬프 2개 적립 완료", body: "럭키할인마트에서 스탬프가 적립됐어요. 10개 모으면 경품을 드려요!", time: "1시간 전", unread: true, storeId: "lucky-discount" },
+    { id: 3, type: "dangol", title: "단골 가게 새 소식", body: "고덕 베이커리 단골 소식: '오늘 오후 3시 이후 크루아상 1+1 진행'", time: "3시간 전", unread: false, storeId: "godeok-bakery" },
+    { id: 4, type: "coupon", title: "쿠폰 만료 3일 전", body: "우리농산물 신규 가입 쿠폰이 3일 후 만료돼요. 지금 바로 사용해보세요.", time: "어제", unread: false, storeId: "woori-farm" },
+    { id: 5, type: "event", title: "멤버 전용 할인 행사", body: "GO PUB 이번 주말 멤버 전용 10% 할인 행사가 진행돼요.", time: "2일 전", unread: false, storeId: "go-pub" },
   ];
 
   const typeIcon: Record<string, string> = {
@@ -39,9 +40,10 @@ function NotificationsScreen() {
   return (
     <div className="flex flex-col gap-0.5 pb-6 pt-2">
       {notifications.map((n) => (
-        <div
+        <button
           key={n.id}
-          className={`relative flex items-start gap-3 px-5 py-3.5 ${n.unread ? "bg-emerald-50/60" : ""}`}
+          onClick={() => openStore(n.storeId)}
+          className={`relative flex items-start gap-3 px-5 py-3.5 text-left ${n.unread ? "bg-emerald-50/60" : ""}`}
         >
           {n.unread && (
             <span className="absolute right-5 top-4 h-2 w-2 rounded-full bg-emerald-500" />
@@ -56,7 +58,7 @@ function NotificationsScreen() {
             <p className="mt-0.5 text-xs leading-relaxed text-ink-500">{n.body}</p>
             <p className="mt-1 text-[11px] text-ink-400">{n.time}</p>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );

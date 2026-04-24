@@ -9,7 +9,7 @@ type ViewMode = "list" | "map";
 
 /* ── 메인 탭 ─────────────────────────────────────────── */
 function MarketMain() {
-  const { isMember, openMembership, go, communityPosts } = useApp();
+  const { isMember, openMembership, go, openStore, communityPosts } = useApp();
   const market = getMarket("godeok-2dong");
   const storeList = storesByMarket(market.id);
   const MarketIcon = marketIcons[market.icon];
@@ -150,7 +150,11 @@ function MarketMain() {
           {storeList.slice(0, 3).map((s) => {
             const Icon = storeIcons[s.icon];
             return (
-              <div key={s.id} className="glass flex items-center gap-3 rounded-2xl p-3 shadow-card">
+              <button
+                key={s.id}
+                onClick={() => openStore(s.id)}
+                className="glass flex items-center gap-3 rounded-2xl p-3 text-left shadow-card"
+              >
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${s.gradient}`}>
                   <Icon className="h-5 w-5 text-ink-900" />
                 </div>
@@ -163,7 +167,7 @@ function MarketMain() {
                     이벤트
                   </span>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>

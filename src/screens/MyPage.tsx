@@ -132,13 +132,13 @@ export function MyPage() {
             </div>
             <button
               onClick={() => setNotifMarket((v) => !v)}
-              className={`relative h-6 w-11 rounded-full transition ${
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
                 notifMarket ? "bg-brand-500" : "bg-ink-200"
               }`}
             >
               <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                  notifMarket ? "translate-x-5" : "translate-x-0.5"
+                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  notifMarket ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </button>
@@ -151,13 +151,13 @@ export function MyPage() {
             </div>
             <button
               onClick={() => setNotifDangol((v) => !v)}
-              className={`relative h-6 w-11 rounded-full transition ${
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
                 notifDangol ? "bg-brand-500" : "bg-ink-200"
               }`}
             >
               <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                  notifDangol ? "translate-x-5" : "translate-x-0.5"
+                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  notifDangol ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </button>
