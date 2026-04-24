@@ -1,6 +1,5 @@
 import { AppProvider, useApp, type Screen } from "./store";
 import { PhoneFrame } from "./components/PhoneFrame";
-import { StatusBar } from "./components/StatusBar";
 import { TabBar } from "./components/TabBar";
 import { AppHeader } from "./components/AppHeader";
 import { ToastStack } from "./components/ToastStack";
@@ -123,10 +122,11 @@ function AppShell() {
   const showTabBar = screen !== "notifications";
   return (
     <PhoneFrame>
-      <StatusBar />
       {showHeader && <AppHeader title={HEADER_TITLES[screen]} />}
-      <div className="relative flex flex-1 flex-col overflow-hidden">
-        <ScreenBody />
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className={showTabBar ? "flex min-h-0 flex-1 flex-col pb-16" : "flex min-h-0 flex-1 flex-col"}>
+          <ScreenBody />
+        </div>
         {showTabBar && <TabBar />}
       </div>
       <ToastStack />

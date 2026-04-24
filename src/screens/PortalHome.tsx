@@ -9,12 +9,12 @@ export function PortalHome() {
     <div className="flex-1 overflow-y-auto pb-4">
       {/* hero */}
       <div className="px-5 pt-2">
-        <div className="kicker">강동구 · 골목형상점가</div>
+        <div className="kicker">강동 골목형 상점가의 새로운 이름</div>
         <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight">
-          이번주 골목형 상점가 소식
+          강동 골목 here
         </h1>
         <p className="mt-2 text-sm text-ink-500">
-          지금 참여 가능한 9개 상점가를 한 곳에서.
+          지금 근처 9개 상점가의 신선한 소식을 확인하세요.
         </p>
       </div>
 

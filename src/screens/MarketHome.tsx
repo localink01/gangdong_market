@@ -172,7 +172,7 @@ function MarketMain() {
   );
 }
 
-/* ── 상점 목록 탭 ─────────────────────────────────────── */
+/* ── 상점가 지도 탭 ─────────────────────────────────────── */
 function MarketStores({
   viewMode,
   setViewMode,
@@ -469,7 +469,7 @@ export function MarketHome() {
 
   const tabLabels: Record<MarketTab, string> = {
     main: "메인",
-    stores: "상점 목록",
+    stores: "상점가 지도",
     feed: "피드",
   };
 

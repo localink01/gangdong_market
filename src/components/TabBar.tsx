@@ -25,7 +25,7 @@ const tabs: TabDef[] = [
 export function TabBar() {
   const { screen, go } = useApp();
   return (
-    <div className="pointer-events-auto sticky bottom-0 z-30 mx-3 mb-3">
+    <div className="pointer-events-none absolute inset-x-3 bottom-6 z-[60]">
       <nav className="glass-strong flex items-center justify-between rounded-[28px] px-2 py-2 shadow-glass">
         {tabs.map((tab) => {
           const active = tab.activeFor.includes(screen);
@@ -34,7 +34,7 @@ export function TabBar() {
             <button
               key={tab.label}
               onClick={() => go(tab.target)}
-              className={`flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] transition ${
+              className={`pointer-events-auto flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] transition ${
                 active ? "bg-white/80 text-brand-600 shadow-card" : "text-ink-500"
               }`}
             >
