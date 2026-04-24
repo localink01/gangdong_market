@@ -20,8 +20,13 @@ export function PortalHome() {
 
       {/* season banner */}
       <div className="mx-5 mt-4 overflow-hidden rounded-3xl shadow-card">
-        <div className="relative h-40 bg-gradient-to-br from-emerald-400 via-teal-400 to-sky-400">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_55%)]" />
+        <div className="relative h-40">
+          <img
+            src="/samples/hero_image.jpg"
+            alt="봄맞이 이벤트 배너"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-x-0 bottom-0 p-4">
             <div className="glass rounded-2xl p-3 text-white">
               <div className="text-[11px] font-semibold uppercase tracking-wider opacity-90">
