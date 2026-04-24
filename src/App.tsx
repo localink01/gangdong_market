@@ -125,8 +125,8 @@ function AppShell() {
   return (
     <PhoneFrame>
       {showHeader && <AppHeader title={HEADER_TITLES[screen]} />}
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className={showTabBar ? "flex min-h-0 flex-1 flex-col pb-16" : "flex min-h-0 flex-1 flex-col"}>
+      <div className="relative min-h-0 flex-1">
+        <div className={`absolute inset-0 overflow-y-auto${showTabBar ? " pb-16" : ""}`}>
           <ScreenBody />
         </div>
         {showTabBar && <TabBar />}
@@ -294,12 +294,9 @@ function ScenarioNav() {
 
 function Root() {
   return (
-    <div className="ambient-bg flex min-h-full w-full items-stretch justify-center">
-      <ScenarioNav />
-      <div className="flex w-full flex-1 items-stretch justify-center md:items-center md:py-6">
-        <div className="relative h-[100dvh] w-full md:h-[880px] md:max-h-[92vh] md:w-auto">
-          <AppShell />
-        </div>
+    <div className="ambient-bg flex h-[100dvh] w-full flex-col items-center">
+      <div className="relative min-h-0 w-full flex-1">
+        <AppShell />
       </div>
     </div>
   );
