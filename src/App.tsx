@@ -6,6 +6,7 @@ import { ToastStack } from "./components/ToastStack";
 import { MembershipSheet } from "./components/MembershipSheet";
 import { DangolSheet } from "./components/DangolSheet";
 import { PortalHome } from "./screens/PortalHome";
+import { RegionPortal } from "./screens/RegionPortal";
 import { MarketHome } from "./screens/MarketHome";
 import { StoreDetail } from "./screens/StoreDetail";
 import { CommunityFeed } from "./screens/CommunityFeed";
@@ -64,12 +65,13 @@ function NotificationsScreen() {
   );
 }
 
-// 포털은 자체 히어로 이미지를 사용
-const NO_HEADER_SCREENS: Screen[] = ["portal"];
+// G-00/M-00은 상단바 없이 화면 자체 컨텍스트를 사용
+const NO_HEADER_SCREENS: Screen[] = ["portal", "region"];
 
 const HEADER_TITLES: Record<Screen, string> = {
-  portal: "강동구 골목형상점가",
-  market: "고덕2동 골목형상점가",
+  portal: "전체 포털",
+  region: "지자체 포털",
+  market: "상권 포털",
   stores: "참여 상점 보기",
   store: "가게 상세",
   community: "커뮤니티",
@@ -89,6 +91,8 @@ function ScreenBody() {
   switch (screen) {
     case "portal":
       return <PortalHome />;
+    case "region":
+      return <RegionPortal />;
     case "market":
       return <MarketHome />;
     case "stores":
@@ -121,7 +125,7 @@ function ScreenBody() {
 function AppShell() {
   const { screen } = useApp();
   const showHeader = !NO_HEADER_SCREENS.includes(screen);
-  const showTabBar = screen !== "notifications";
+  const showTabBar = screen !== "notifications" && screen !== "portal";
   return (
     <PhoneFrame>
       {showHeader && <AppHeader title={HEADER_TITLES[screen]} />}
@@ -152,17 +156,17 @@ const scenarios: Scenario[] = [
     id: "s01",
     group: "주민",
     no: "S-01",
-    title: "포털 홈",
-    desc: "강동구 9개 상점가를 한 눈에",
+    title: "G-00 전체 포털",
+    desc: "지자체를 선택하는 초기 진입",
     run: (c) => c.go("portal"),
   },
   {
     id: "s02",
     group: "주민",
     no: "S-02",
-    title: "시장 홈 (비멤버)",
-    desc: "고덕2동 · 멤버십 진입 전",
-    run: (c) => c.go("market"),
+    title: "M-00 지자체 포털",
+    desc: "지자체 내 상권 목록 선택",
+    run: (c) => c.go("region"),
   },
   {
     id: "s04",
@@ -179,8 +183,8 @@ const scenarios: Scenario[] = [
     id: "s05",
     group: "주민",
     no: "S-05",
-    title: "커뮤니티 피드",
-    desc: "멤버 전용 이야기",
+    title: "MK-00 상권 포털",
+    desc: "점포 탐색·커뮤니티·혜택 연결",
     run: (c) => { c.go("market"); },
   },
   {
@@ -240,6 +244,7 @@ function ScenarioNav() {
   const ctx = useApp();
   const ReloadIcon = appIcons.reload;
   const groups: Scenario["group"][] = ["주민", "점포", "운영"];
+  const isAppMode = ctx.channelMode === "app";
   return (
     <aside className="hidden w-[320px] shrink-0 flex-col gap-4 overflow-y-auto p-6 md:flex">
       <div>
@@ -251,6 +256,33 @@ function ScenarioNav() {
           8개 핵심 화면으로 시연용 프로토타입입니다. 옆의 기기에서 직접
           조작하거나 아래 시나리오로 점프하세요.
         </p>
+      </div>
+
+      <div className="glass rounded-2xl p-3 shadow-card">
+        <div className="text-[11px] font-semibold text-ink-500">채널 모드</div>
+        <div className="mt-2 inline-flex rounded-full bg-white/70 p-1">
+          <button
+            onClick={() => ctx.setChannelMode("web")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+              !isAppMode ? "bg-ink-900 text-white" : "text-ink-500"
+            }`}
+          >
+            Web
+          </button>
+          <button
+            onClick={() => ctx.setChannelMode("app")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+              isAppMode ? "bg-ink-900 text-white" : "text-ink-500"
+            }`}
+          >
+            App
+          </button>
+        </div>
+        <div className="mt-2 text-[11px] text-ink-500">
+          {isAppMode
+            ? `앱 모드 · 고정 지역 ${ctx.appRegionSlug}`
+            : "웹 모드 · G-00 진입 허용"}
+        </div>
       </div>
 
       {groups.map((g) => (

@@ -5,6 +5,7 @@ import { appIcons } from "../icons";
 const MARKET_SCREENS: Screen[] = [
   "market", "stores", "store", "community", "dangolFeed", "dangolPost",
 ];
+const PORTAL_SCREENS: Screen[] = ["region"];
 // 마이페이지 탭이 활성화되어야 하는 모든 화면
 const MYPAGE_SCREENS: Screen[] = ["mypage", "admin"];
 
@@ -16,24 +17,30 @@ type TabDef = {
 };
 
 const tabs: TabDef[] = [
-  { label: "포털",   icon: "home",    target: "portal",   activeFor: ["portal"] },
+  { label: "포털",   icon: "home",    target: "region",   activeFor: PORTAL_SCREENS },
   { label: "상점가", icon: "reader",  target: "market",   activeFor: MARKET_SCREENS },
   { label: "혜택",   icon: "benefit", target: "benefits", activeFor: ["benefits"] },
   { label: "마이",   icon: "person",  target: "mypage",   activeFor: MYPAGE_SCREENS },
 ];
 
 export function TabBar() {
-  const { screen, go } = useApp();
+  const { screen, go, channelMode, trackEvent } = useApp();
+  const resolvedTabs: TabDef[] = tabs;
   return (
     <div className="pointer-events-none absolute inset-x-3 bottom-6 z-[60]">
       <nav className="glass-strong flex items-center justify-between rounded-[28px] px-2 py-2 shadow-glass">
-        {tabs.map((tab) => {
+        {resolvedTabs.map((tab) => {
           const active = tab.activeFor.includes(screen);
           const Icon = appIcons[tab.icon];
           return (
             <button
               key={tab.label}
-              onClick={() => go(tab.target)}
+              onClick={() => {
+                if (channelMode === "app" && tab.target === "region") {
+                  trackEvent("app_home_returned_to_m00");
+                }
+                go(tab.target);
+              }}
               className={`pointer-events-auto flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] transition ${
                 active ? "bg-white/80 text-brand-600 shadow-card" : "text-ink-500"
               }`}

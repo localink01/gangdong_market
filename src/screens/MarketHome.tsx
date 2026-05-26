@@ -9,8 +9,8 @@ type ViewMode = "list" | "map";
 
 /* ── 메인 탭 ─────────────────────────────────────────── */
 function MarketMain() {
-  const { isMember, openMembership, go, openStore, communityPosts } = useApp();
-  const market = getMarket("godeok-2dong");
+  const { isMember, openMembership, go, openStore, communityPosts, activeMarketSlug } = useApp();
+  const market = getMarket(activeMarketSlug);
   const storeList = storesByMarket(market.id);
   const MarketIcon = marketIcons[market.icon];
   const LockIcon = appIcons.lock;
@@ -178,15 +178,17 @@ function MarketMain() {
 
 /* ── 상점가 지도 탭 ─────────────────────────────────────── */
 function MarketStores({
+  marketSlug,
   viewMode,
   setViewMode,
 }: {
+  marketSlug: string;
   viewMode: ViewMode;
   setViewMode: (m: ViewMode) => void;
 }) {
   const { openStore } = useApp();
   const MapIcon = appIcons.pin;
-  const stores = useMemo(() => storesByMarket("godeok-2dong"), []);
+  const stores = useMemo(() => storesByMarket(marketSlug), [marketSlug]);
 
   return (
     <div className="pb-4">
@@ -270,9 +272,11 @@ function MarketStores({
 
 /* ── 피드 탭 ─────────────────────────────────────────── */
 function MarketFeed({
+  marketSlug,
   feedTab,
   setFeedTab,
 }: {
+  marketSlug: string;
   feedTab: FeedTab;
   setFeedTab: (t: FeedTab) => void;
 }) {
@@ -283,7 +287,7 @@ function MarketFeed({
   const TimeIcon = appIcons.clock;
   const PersonIcon = appIcons.person;
 
-  const stores = useMemo(() => storesByMarket("godeok-2dong"), []);
+  const stores = useMemo(() => storesByMarket(marketSlug), [marketSlug]);
   const [selectedStoreId, setSelectedStoreId] = useState("all");
 
   const allNews = stores.flatMap((s) =>
@@ -467,6 +471,7 @@ function MarketFeed({
 
 /* ── 메인 컨테이너 ───────────────────────────────────── */
 export function MarketHome() {
+  const { activeMarketSlug } = useApp();
   const [marketTab, setMarketTab] = useState<MarketTab>("main");
   const [feedTab, setFeedTab] = useState<FeedTab>("community");
   const [viewMode, setViewMode] = useState<ViewMode>("map");
@@ -502,10 +507,18 @@ export function MarketHome() {
       <div className="flex-1 overflow-y-auto">
         {marketTab === "main" && <MarketMain />}
         {marketTab === "stores" && (
-          <MarketStores viewMode={viewMode} setViewMode={setViewMode} />
+          <MarketStores
+            marketSlug={activeMarketSlug}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
         )}
         {marketTab === "feed" && (
-          <MarketFeed feedTab={feedTab} setFeedTab={setFeedTab} />
+          <MarketFeed
+            marketSlug={activeMarketSlug}
+            feedTab={feedTab}
+            setFeedTab={setFeedTab}
+          />
         )}
       </div>
     </div>

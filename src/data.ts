@@ -1,5 +1,14 @@
 import type { MarketIconKey, StoreIconKey } from "./icons";
 
+export type Region = {
+  slug: string;
+  adminName: string;
+  brandName: string;
+  subtitle: string;
+  status: "live" | "ready";
+  defaultMarketId: string;
+};
+
 export type DangolNews = {
   id: string;
   title: string;
@@ -9,6 +18,7 @@ export type DangolNews = {
 
 export type Market = {
   id: string;
+  regionSlug: string;
   name: string;
   subtitle: string;
   members: number;
@@ -39,6 +49,7 @@ export type Store = {
 export const markets: Market[] = [
   {
     id: "godeok-2dong",
+    regionSlug: "gangdong-gu",
     name: "고덕2동 골목형상점가",
     subtitle: "우리 동네를 다시 걷게 만드는 곳",
     members: 127,
@@ -50,6 +61,7 @@ export const markets: Market[] = [
   },
   {
     id: "cheonho-rodeo",
+    regionSlug: "gangdong-gu",
     name: "천호 로데오 상점가",
     subtitle: "젊은 감각, 밤까지 깨어있는 거리",
     members: 0,
@@ -61,6 +73,7 @@ export const markets: Market[] = [
   },
   {
     id: "amsa-market",
+    regionSlug: "gangdong-gu",
     name: "암사 전통시장",
     subtitle: "세 살 된 아이도 아는 그 국밥집",
     members: 0,
@@ -69,6 +82,33 @@ export const markets: Market[] = [
     gradient: "from-orange-400 via-amber-300 to-yellow-300",
     icon: "reader",
     image: "/samples/market-amsa.svg",
+  },
+];
+
+export const regions: Region[] = [
+  {
+    slug: "gangdong-gu",
+    adminName: "강동구",
+    brandName: "강동 hero",
+    subtitle: "고덕2동 중심으로 상권 운영 중",
+    status: "live",
+    defaultMarketId: "godeok-2dong",
+  },
+  {
+    slug: "gongju-si",
+    adminName: "공주시",
+    brandName: "공주왕도심",
+    subtitle: "왕도심 상권 연동 준비 중",
+    status: "ready",
+    defaultMarketId: "godeok-2dong",
+  },
+  {
+    slug: "iksan-si",
+    adminName: "익산시",
+    brandName: "익산문화거리",
+    subtitle: "문화거리 상권 연동 준비 중",
+    status: "ready",
+    defaultMarketId: "godeok-2dong",
   },
 ];
 
@@ -173,7 +213,10 @@ export const stores: Store[] = [
   },
 ];
 
+export const getRegion = (slug: string) => regions.find((r) => r.slug === slug);
 export const getStore = (id: string | null) => stores.find((s) => s.id === id);
 export const getMarket = (id: string) => markets.find((m) => m.id === id)!;
+export const marketsByRegion = (regionSlug: string) =>
+  markets.filter((m) => m.regionSlug === regionSlug);
 export const storesByMarket = (marketId: string) =>
   stores.filter((s) => s.marketId === marketId);
