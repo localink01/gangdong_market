@@ -515,7 +515,6 @@ export function RegionPortal() {
         </div>
         <div className="flex flex-col gap-3">
           {marketList.map((market) => {
-            const Icon = marketIcons[market.icon];
             return (
               <button
                 key={market.id}
@@ -535,9 +534,6 @@ export function RegionPortal() {
                     className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
-                  <div className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm">
-                    <Icon className="h-5 w-5 text-ink-900" />
-                  </div>
               </div>
                 <div className="glass-strong p-4">
                   <div className="flex items-center justify-between">
