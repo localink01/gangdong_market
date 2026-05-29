@@ -4,12 +4,13 @@ import { appIcons, storeIcons } from "../icons";
 import { useApp } from "../store";
 
 export function MyPage() {
-  const { isMember, dangolStoreIds, openMembership, openStore, go } = useApp();
+  const { isMember, dangolStoreIds, openMembership, openStore, go, goToBenefits } = useApp();
   const BellIcon = appIcons.bell;
   const PersonIcon = appIcons.person;
   const HeartIcon = appIcons.heart;
   const GearIcon = appIcons.manage;
   const StarIcon = appIcons.star;
+  const CouponIcon = appIcons.benefit;
 
   const [notifMarket, setNotifMarket] = useState(true);
   const [notifDangol, setNotifDangol] = useState(true);
@@ -34,6 +35,45 @@ export function MyPage() {
           </div>
           <button className="rounded-full glass px-3 py-1.5 text-xs font-semibold shadow-card">
             수정
+          </button>
+        </div>
+      </div>
+
+      {/* 내 혜택 — 쿠폰/스탬프 1뎁스 진입 (Phase 3 IA 적용) */}
+      <div className="mx-5 mt-5">
+        <div className="mb-2 flex items-end justify-between">
+          <div className="text-base font-semibold">내 혜택</div>
+          <button
+            onClick={() => goToBenefits("available")}
+            className="text-xs font-semibold text-brand-600"
+          >
+            받을 수 있는 쿠폰 →
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => goToBenefits("owned", "active")}
+            className="glass-strong flex flex-col items-start gap-2 rounded-3xl p-4 text-left shadow-glass"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-brand-500/15 text-brand-700">
+              <CouponIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold text-ink-500">사용 가능 쿠폰</div>
+              <div className="mt-0.5 text-xl font-bold">2장</div>
+            </div>
+          </button>
+          <button
+            onClick={() => goToBenefits("owned", "expired")}
+            className="glass flex flex-col items-start gap-2 rounded-3xl p-4 text-left shadow-card"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-ink-900/5 text-ink-500">
+              <StarIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold text-ink-500">스탬프투어</div>
+              <div className="mt-0.5 text-xl font-bold text-ink-400">준비 중</div>
+            </div>
           </button>
         </div>
       </div>
@@ -165,45 +205,55 @@ export function MyPage() {
         </div>
       </div>
 
-      {/* 운영 대시보드 */}
-      <div className="mx-5 mt-5">
-        <div className="mb-2 text-base font-semibold">운영 대시보드</div>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => go("merchantCouncilAdmin")}
-            className="flex w-full items-center gap-3 rounded-3xl glass px-4 py-3.5 text-left shadow-card"
-          >
-            <GearIcon className="h-5 w-5 text-ink-600" />
-            <div className="flex-1">
-              <div className="text-sm font-semibold">상인회 대시보드</div>
-              <div className="text-xs text-ink-500">상점가 공지·이벤트 운영 및 참여 현황</div>
-            </div>
-            <span className="text-ink-400">→</span>
-          </button>
+      {/* 운영 대시보드 — 사용자 영역과 시각적 분리 (Phase 3) */}
+      <div className="mx-5 mt-6">
+        <div className="rounded-3xl border border-ink-900/10 bg-ink-900/[0.03] p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-base font-semibold">운영 대시보드</div>
+            <span className="rounded-full bg-ink-900/10 px-2 py-0.5 text-[10px] font-semibold text-ink-700">
+              운영자 전용
+            </span>
+          </div>
+          <p className="mb-3 text-xs leading-relaxed text-ink-500">
+            지자체/상권/가게 권한에 따라 보이는 도구가 달라요.
+          </p>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => go("merchantCouncilAdmin")}
+              className="flex w-full items-center gap-3 rounded-2xl bg-white/80 px-4 py-3.5 text-left shadow-card"
+            >
+              <GearIcon className="h-5 w-5 text-ink-600" />
+              <div className="flex-1">
+                <div className="text-sm font-semibold">상인회 대시보드</div>
+                <div className="text-xs text-ink-500">상점가 공지·이벤트 운영 및 참여 현황</div>
+              </div>
+              <span className="text-ink-400">→</span>
+            </button>
 
-          <button
-            onClick={() => go("districtAdmin")}
-            className="flex w-full items-center gap-3 rounded-3xl glass px-4 py-3.5 text-left shadow-card"
-          >
-            <BellIcon className="h-5 w-5 text-ink-600" />
-            <div className="flex-1">
-              <div className="text-sm font-semibold">구청 대시보드</div>
-              <div className="text-xs text-ink-500">상점가별 성과 통계와 정책 리포트</div>
-            </div>
-            <span className="text-ink-400">→</span>
-          </button>
+            <button
+              onClick={() => go("districtAdmin")}
+              className="flex w-full items-center gap-3 rounded-2xl bg-white/80 px-4 py-3.5 text-left shadow-card"
+            >
+              <BellIcon className="h-5 w-5 text-ink-600" />
+              <div className="flex-1">
+                <div className="text-sm font-semibold">구청 대시보드</div>
+                <div className="text-xs text-ink-500">상점가별 성과 통계와 정책 리포트</div>
+              </div>
+              <span className="text-ink-400">→</span>
+            </button>
 
-          <button
-            onClick={() => go("storeAdmin")}
-            className="flex w-full items-center gap-3 rounded-3xl glass px-4 py-3.5 text-left shadow-card"
-          >
-            <HeartIcon className="h-5 w-5 text-ink-600" />
-            <div className="flex-1">
-              <div className="text-sm font-semibold">상점 대시보드</div>
-              <div className="text-xs text-ink-500">내 가게 단골·쿠폰·소식 발행 관리</div>
-            </div>
-            <span className="text-ink-400">→</span>
-          </button>
+            <button
+              onClick={() => go("storeAdmin")}
+              className="flex w-full items-center gap-3 rounded-2xl bg-white/80 px-4 py-3.5 text-left shadow-card"
+            >
+              <HeartIcon className="h-5 w-5 text-ink-600" />
+              <div className="flex-1">
+                <div className="text-sm font-semibold">상점 대시보드</div>
+                <div className="text-xs text-ink-500">내 가게 단골·쿠폰·소식 발행 관리</div>
+              </div>
+              <span className="text-ink-400">→</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

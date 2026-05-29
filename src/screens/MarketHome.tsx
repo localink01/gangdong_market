@@ -473,100 +473,30 @@ function MarketFeed({
 }
 
 /* ── 메인 컨테이너 ───────────────────────────────────── */
+// Phase 3(2-3) 적용: MarketHome은 상권 홈(메인) 단일 화면으로 단순화한다.
+// 가게 목록은 하단 "가게" 탭(StoresExplorer), 커뮤니티/단골 소식은 하단 "커뮤니티" 탭으로 진입한다.
 export function MarketHome() {
-  const { activeMarketSlug } = useApp();
-  const [marketTab, setMarketTab] = useState<MarketTab>("main");
-  const [feedTab, setFeedTab] = useState<FeedTab>("community");
-  const [viewMode, setViewMode] = useState<ViewMode>("map");
-
-  // URL query(tab/feedTab/view)를 초기 상태와 동기화해 딥링크를 보장한다.
+  // 레거시 URL(?tab=stores 등)로 진입한 경우 쿼리를 정리해 일관된 상태를 유지한다.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get("tab");
-    const feed = params.get("feedTab");
-    const view = params.get("view");
-
-    if (tab === "main" || tab === "stores" || tab === "feed") {
-      setMarketTab(tab);
-    }
-    if (feed === "community" || feed === "dangol") {
-      setFeedTab(feed);
-    }
-    if (view === "list" || view === "map") {
-      setViewMode(view);
-    }
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("tab", marketTab);
-
-    if (marketTab === "feed") {
-      params.set("feedTab", feedTab);
-      params.delete("view");
-    } else if (marketTab === "stores") {
-      params.set("view", viewMode);
-      params.delete("feedTab");
-    } else {
-      params.delete("feedTab");
-      params.delete("view");
-    }
-
-    const nextSearch = params.toString();
-    const currentSearch = window.location.search.startsWith("?")
-      ? window.location.search.slice(1)
-      : window.location.search;
-
-    if (nextSearch !== currentSearch) {
+    let mutated = false;
+    ["tab", "feedTab", "view"].forEach((key) => {
+      if (params.has(key)) {
+        params.delete(key);
+        mutated = true;
+      }
+    });
+    if (mutated) {
+      const nextSearch = params.toString();
       const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}`;
       window.history.replaceState(null, "", nextUrl);
     }
-  }, [feedTab, marketTab, viewMode]);
-
-  const tabLabels: Record<MarketTab, string> = {
-    main: "메인",
-    stores: "상점가 지도",
-    feed: "피드",
-  };
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* 내부 탭 바 */}
-      <div className="border-b border-black/5 bg-white/60 px-5 pb-2.5 pt-2 backdrop-blur-sm">
-        <div className="flex gap-1 rounded-full bg-black/5 p-1">
-          {(["main", "stores", "feed"] as MarketTab[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setMarketTab(tab)}
-              className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition ${
-                marketTab === tab
-                  ? "bg-white text-ink-900 shadow-card"
-                  : "text-ink-500"
-              }`}
-            >
-              {tabLabels[tab]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 콘텐츠 영역 */}
       <div className="flex-1 overflow-y-auto">
-        {marketTab === "main" && <MarketMain />}
-        {marketTab === "stores" && (
-          <MarketStores
-            marketSlug={activeMarketSlug}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          />
-        )}
-        {marketTab === "feed" && (
-          <MarketFeed
-            marketSlug={activeMarketSlug}
-            feedTab={feedTab}
-            setFeedTab={setFeedTab}
-          />
-        )}
+        <MarketMain />
       </div>
     </div>
   );

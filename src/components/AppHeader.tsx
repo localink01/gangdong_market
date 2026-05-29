@@ -3,10 +3,14 @@ import { appIcons } from "../icons";
 
 export function AppHeader({
   title,
+  marketName,
+  onChangeMarket,
   onBack,
   transparent = false,
 }: {
   title?: string;
+  marketName?: string;
+  onChangeMarket?: () => void;
   onBack?: () => void;
   transparent?: boolean;
 }) {
@@ -37,7 +41,17 @@ export function AppHeader({
           />
         </svg>
       </button>
-      <h1 className="text-[15px] font-semibold">{title}</h1>
+      {marketName ? (
+        <button
+          onClick={onChangeMarket}
+          className="flex max-w-[60%] items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-semibold shadow-card transition active:scale-[0.98]"
+        >
+          <span className="truncate">{marketName}</span>
+          <span className="text-ink-400">▾</span>
+        </button>
+      ) : (
+        <h1 className="text-[15px] font-semibold">{title}</h1>
+      )}
       <button
         onClick={() => go("notifications")}
         className="flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-card transition active:scale-95"

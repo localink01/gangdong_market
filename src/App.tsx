@@ -19,6 +19,7 @@ import { MyPage } from "./screens/MyPage";
 import { MerchantCouncilDashboard } from "./screens/MerchantCouncilDashboard";
 import { DistrictDashboard } from "./screens/DistrictDashboard";
 import { StoreAdminDashboard } from "./screens/StoreAdminDashboard";
+import { getMarket } from "./data";
 import { appIcons } from "./icons";
 
 function NotificationsScreen() {
@@ -69,20 +70,23 @@ const NO_HEADER_SCREENS: Screen[] = ["portal", "region"];
 const HEADER_TITLES: Record<Screen, string> = {
   portal: "전체 포털",
   region: "지자체 포털",
-  market: "상권 포털",
-  stores: "참여 상점 보기",
+  market: "상권 홈",
+  stores: "가게",
   store: "가게 상세",
   community: "커뮤니티",
   dangolFeed: "단골 소식",
   dangolPost: "단골 소식 상세",
   benefits: "혜택",
-  mypage: "마이페이지",
+  mypage: "마이",
   notifications: "알림",
   merchantCouncilAdmin: "상인회 대시보드",
   districtAdmin: "구청 대시보드",
   storeAdmin: "상점 대시보드",
   admin: "운영 대시보드",
 };
+
+// 상권 컨텍스트(상점가명 칩)을 표시하는 화면. 나머지는 타이틀 텍스트 노출.
+const MARKET_CHIP_SCREENS: Screen[] = ["market", "stores", "community", "dangolFeed"];
 
 function ScreenBody() {
   const { screen } = useApp();
@@ -121,12 +125,20 @@ function ScreenBody() {
 }
 
 function AppShell() {
-  const { screen } = useApp();
+  const { screen, activeMarketSlug, go } = useApp();
   const showHeader = !NO_HEADER_SCREENS.includes(screen);
   const showTabBar = screen !== "notifications" && screen !== "portal";
+  const showMarketChip = MARKET_CHIP_SCREENS.includes(screen) && !!activeMarketSlug;
+  const marketName = showMarketChip ? getMarket(activeMarketSlug).name : undefined;
   return (
     <PhoneFrame>
-      {showHeader && <AppHeader title={HEADER_TITLES[screen]} />}
+      {showHeader && (
+        <AppHeader
+          title={HEADER_TITLES[screen]}
+          marketName={marketName}
+          onChangeMarket={() => go("region")}
+        />
+      )}
       <div className="relative min-h-0 flex-1">
         <div className={`absolute inset-0 overflow-y-auto${showTabBar ? " pb-16" : ""}`}>
           <ScreenBody />
