@@ -31,7 +31,7 @@ export function MembershipSheet() {
           {[
             { i: FeedIcon, t: "멤버 커뮤니티 접근", d: "공지·가게 추천·꿀팁" },
             { i: BellIcon, t: "이벤트/쿠폰 알림", d: "주요 소식 놓치지 않기" },
-            { i: BenefitIcon, t: "멤버 한정 혜택", d: "스탬프 투어, 멤버 전용 쿠폰" },
+            { i: BenefitIcon, t: "멤버 한정 혜택", d: "멤버 전용 쿠폰과 이벤트" },
           ].map((b) => (
             <div key={b.t} className="glass flex items-center gap-3 rounded-2xl p-3">
               <b.i className="h-5 w-5 text-ink-700" />

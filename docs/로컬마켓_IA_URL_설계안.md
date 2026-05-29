@@ -9,9 +9,9 @@
 ## 1. 설계 목표
 
 1. 앱/웹은 하나로 유지하고 지역은 테넌트로 확장한다.
-2. 사용자는 지역 -> 상권 -> 점포 흐름으로 자연스럽게 이동한다.
-3. 운영자는 권한 범위(지자체/상권/점포)에 맞는 화면만 접근한다.
-4. URL만 보고도 현재 컨텍스트(지역, 상권, 점포)를 해석할 수 있어야 한다.
+2. 사용자는 지역 -> 상권 -> 가게 흐름으로 자연스럽게 이동한다.
+3. 운영자는 권한 범위(지자체/상권/가게)에 맞는 화면만 접근한다.
+4. URL만 보고도 현재 컨텍스트(지역, 상권, 가게)를 해석할 수 있어야 한다.
 
 ---
 
@@ -31,15 +31,15 @@
 ├─ MK-00 상권 포털
 │  ├─ 상권 홈 (예: 고덕2동, 천호로데오)
 │  ├─ 멤버 커뮤니티 피드
-│  ├─ 상점가 지도/점포 목록
+│  ├─ 상점가 지도/가게 목록
 │  ├─ 이벤트/쿠폰/스탬프투어
 │  └─ 멤버십 등록
 │
-├─ ST-00 점포
-│  ├─ 점포 상세
+├─ ST-00 가게
+│  ├─ 가게 상세
 │  ├─ 단골 등록
 │  ├─ 단골 전용 소식
-│  ├─ 점포 쿠폰
+│  ├─ 가게 쿠폰
 │  └─ 스탬프 참여 지점 정보
 │
 ├─ U-00 개인 영역
@@ -51,7 +51,7 @@
 └─ O-00 운영자 영역
    ├─ 지자체 운영 (구청/지자체)
    ├─ 상권 운영 (상인회/운영사)
-   ├─ 점포 운영 (가게 담당자)
+   ├─ 가게 운영 (가게 담당자)
    └─ 시스템 운영 (플랫폼)
 ```
 
@@ -93,7 +93,7 @@
 
 1. 포털 탭 -> `M-00 지자체 포털`
 2. 상점가 탭 -> `MK-00 상권 포털`
-3. 혜택 탭 -> `U-00-3 혜택 허브` (상권/점포 혜택 통합)
+3. 혜택 탭 -> `U-00-3 혜택 허브` (상권/가게 혜택 통합)
 4. 마이 탭 -> `U-00-1 내 활동`
 
 보충 규칙:
@@ -164,7 +164,7 @@
 3. 지자체 내 상권 목록
 - `/regions/gangdong-gu/markets`
 
-### 4-2. 상권/점포
+### 4-2. 상권/가게
 
 1. 상권 홈
 - `/regions/gangdong-gu/markets/godeok-2dong`
@@ -174,10 +174,10 @@
 - `/regions/gangdong-gu/markets/godeok-2dong?tab=stores&view=map`
 - `/regions/gangdong-gu/markets/godeok-2dong?tab=feed&feedTab=community`
 
-3. 점포 목록
+3. 가게 목록
 - `/regions/gangdong-gu/markets/godeok-2dong/stores`
 
-4. 점포 상세
+4. 가게 상세
 - `/regions/gangdong-gu/markets/godeok-2dong/stores/godeok-bakery`
 
 5. 단골 소식 상세
@@ -188,7 +188,8 @@
 1. 혜택 허브
 - `/benefits`
 - `/benefits?tab=stamp`
-- `/benefits?tab=coupon&status=active`
+- `/benefits?tab=coupon&scope=owned&status=active`
+- `/benefits?tab=coupon&scope=available`
 
 2. 알림
 - `/notifications`
@@ -224,7 +225,7 @@
 - `/ops/regions/{regionSlug}/markets/{marketSlug}/campaigns`
 - `/ops/regions/{regionSlug}/markets/{marketSlug}/notifications`
 
-### 5-4. 점포 운영(가게 담당자)
+### 5-4. 가게 운영(가게 담당자)
 
 - `/ops/regions/{regionSlug}/markets/{marketSlug}/stores/{storeSlug}/dashboard`
 - `/ops/regions/{regionSlug}/markets/{marketSlug}/stores/{storeSlug}/dangol`
@@ -239,7 +240,7 @@
 
 1. `regionSlug`: 지자체 컨텍스트 식별
 2. `marketSlug`: 상권 컨텍스트 식별
-3. `storeSlug`: 점포 컨텍스트 식별
+3. `storeSlug`: 가게 컨텍스트 식별
 4. `newsId`: 콘텐츠 식별자
 
 ### 6-2. Query 파라미터
@@ -247,9 +248,13 @@
 1. `tab`: 화면 메인 탭
 2. `feedTab`: 커뮤니티/단골 소식 구분
 3. `view`: list/map 구분
-4. `status`: 쿠폰 상태(active/used/expired)
-5. `q`: 검색 키워드
-6. `sort`: 정렬 기준
+4. `category`: 피드 카테고리 필터(예: 이벤트, 공지)
+5. `panel`: 보조 패널 구분(예: events)
+6. `month`: 캘린더 기준 월(예: 2026-05)
+7. `date`: 캘린더 선택 날짜(예: 2026-05-29)
+8. `status`: 쿠폰 상태(active/used/expired)
+9. `q`: 검색 키워드
+10. `sort`: 정렬 기준
 
 규칙:
 - 필수 컨텍스트는 path로 전달
@@ -296,7 +301,7 @@
 1. 상권 유입
 - `/regions/gangdong-gu/markets/godeok-2dong?entry=qr&from=poster`
 
-2. 점포 유입
+2. 가게 유입
 - `/regions/gangdong-gu/markets/godeok-2dong/stores/godeok-bakery?entry=qr&from=store-sign`
 
 3. 이벤트 유입
@@ -324,7 +329,7 @@
 2. 역할별 접근 제어
 - 구청: region 범위 조회 중심
 - 상권 운영: market 범위 쓰기 가능
-- 점포 운영: store 범위 쓰기 가능
+- 가게 운영: store 범위 쓰기 가능
 3. 스코프 불일치 시 접근 차단(403)
 
 ---
@@ -337,6 +342,14 @@
 
 1. 기존 임시 경로 또는 state 진입 -> 신규 canonical URL 301/302
 2. canonical URL 우선 정책 유지
+
+### 10-2. 웹 채널 루트 정책
+
+웹 채널에서는 아래를 기본 정책으로 유지한다.
+
+1. `/` 또는 `/regions`는 G-00 렌더링
+2. G-00에서 지자체 선택 후 `/{locale?}/regions/{regionSlug}`로 이동
+3. M-00 이후 하단 네비게이션으로 G-00 복귀 경로는 제공하지 않음
 
 ### 10-3. 앱(WebView) 모드 리다이렉트 규칙
 
@@ -353,7 +366,7 @@
 - 홈: `/{locale?}/regions/{appRegionSlug}`
 - G-00 이동 버튼/메뉴: 미노출
 
-### 10-2. 대표 리다이렉트 예시
+### 10-4. 대표 리다이렉트 예시
 
 - `/market` -> `/regions/gangdong-gu/markets/godeok-2dong`
 - `/store/godeok-bakery` -> `/regions/gangdong-gu/markets/godeok-2dong/stores/godeok-bakery`
@@ -394,7 +407,7 @@
 
 ### 12-1. 1차 (MVP 전환)
 
-1. 지역/상권/점포 path 구조 확정
+1. 지역/상권/가게 path 구조 확정
 2. 사용자 핵심 페이지 canonical URL 적용
 3. `/ops` 권한 라우트 분리
 
@@ -421,7 +434,7 @@
 3. `/regions/gangdong-gu/markets/godeok-2dong` 진입
 4. 멤버십 등록 후 `/regions/gangdong-gu/markets/godeok-2dong?tab=feed&feedTab=community` 접근
 
-### 시나리오 B (웹/앱 공통): 점포 QR 진입
+### 시나리오 B (웹/앱 공통): 가게 QR 진입
 
 1. `/regions/gangdong-gu/markets/godeok-2dong/stores/godeok-bakery?entry=qr`
 2. 비멤버면 멤버십 등록 유도
@@ -438,7 +451,7 @@
 
 1. 앱 실행 -> `/regions/gangdong-gu` (M-00)
 2. 상권 선택 -> `/regions/gangdong-gu/markets/{marketSlug}` (MK-00)
-3. 점포 이동 -> `/regions/gangdong-gu/markets/{marketSlug}/stores/{storeSlug}` (ST-00)
+3. 가게 이동 -> `/regions/gangdong-gu/markets/{marketSlug}/stores/{storeSlug}` (ST-00)
 4. 홈 버튼 탭 -> `/regions/gangdong-gu` (M-00 복귀)
 5. G-00 이동 버튼은 노출되지 않음
 
@@ -451,6 +464,6 @@
 1. 모든 지역 포털
 2. 지자체 포털 (강동 hero/공주왕도심/익산문화거리)
 3. 상권 포털 (고덕2동/천호로데오/상일동)
-4. 점포
+4. 가게
 
 즉, 앱은 하나로 유지하고 URL 컨텍스트와 권한 스코프로 확장하는 구조를 채택한다.

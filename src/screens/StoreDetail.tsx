@@ -129,21 +129,7 @@ export function StoreDetail() {
           </div>
         )}
 
-        {/* stamp */}
-        <div className="mt-4 glass rounded-3xl p-4 shadow-card">
-          <div className="kicker">스탬프 적립 현황</div>
-          <div className="mt-2 flex items-center gap-1.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span
-                key={i}
-                className={`h-6 w-6 rounded-full ${
-                  i < 2 ? "bg-brand-500" : "bg-black/10"
-                }`}
-              />
-            ))}
-            <span className="ml-2 text-xs text-ink-500">2 / 5</span>
-          </div>
-        </div>
+        {/* 스탬프투어는 당장 미구현으로 비활성화 */}
       </div>
     </div>
   );

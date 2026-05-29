@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getMarket, storesByMarket } from "../data";
 import { appIcons, marketIcons, storeIcons } from "../icons";
 import { useApp } from "../store";
@@ -6,6 +6,7 @@ import { useApp } from "../store";
 type MarketTab = "main" | "stores" | "feed";
 type FeedTab = "community" | "dangol";
 type ViewMode = "list" | "map";
+const ENABLE_STAMP_TOUR = false;
 
 /* ── 메인 탭 ─────────────────────────────────────────── */
 function MarketMain() {
@@ -76,30 +77,32 @@ function MarketMain() {
         </div>
       </div>
 
-      {/* 스탬프투어 미리보기 */}
-      <div className="mx-5 mt-4">
-        <div className="rounded-3xl glass p-4 shadow-card">
-          <div className="kicker mb-1">스탬프투어</div>
-          <div className="text-sm font-semibold">고덕 봄 스탬프투어 2026</div>
-          <div className="mt-2 flex gap-1">
-            {Array.from({ length: 10 }, (_, i) => (
-              <div
-                key={i}
-                className={`h-5 w-5 rounded-full border-2 ${
-                  i < 2 ? "border-brand-500 bg-brand-500" : "border-ink-200 bg-white/50"
-                }`}
-              />
-            ))}
+      {/* 스탬프투어는 당장 미구현으로 비활성화 */}
+      {ENABLE_STAMP_TOUR && (
+        <div className="mx-5 mt-4">
+          <div className="rounded-3xl glass p-4 shadow-card">
+            <div className="kicker mb-1">스탬프투어</div>
+            <div className="text-sm font-semibold">고덕 봄 스탬프투어 2026</div>
+            <div className="mt-2 flex gap-1">
+              {Array.from({ length: 10 }, (_, i) => (
+                <div
+                  key={i}
+                  className={`h-5 w-5 rounded-full border-2 ${
+                    i < 2 ? "border-brand-500 bg-brand-500" : "border-ink-200 bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="mt-1 text-xs text-ink-500">2/10 완료 · 완주 시 아메리카노 쿠폰</div>
+            <button
+              onClick={() => go("benefits")}
+              className="mt-2 text-xs font-semibold text-brand-600"
+            >
+              혜택 탭에서 계속하기 →
+            </button>
           </div>
-          <div className="mt-1 text-xs text-ink-500">2/10 완료 · 완주 시 아메리카노 쿠폰</div>
-          <button
-            onClick={() => go("benefits")}
-            className="mt-2 text-xs font-semibold text-brand-600"
-          >
-            혜택 탭에서 계속하기 →
-          </button>
         </div>
-      </div>
+      )}
 
       {/* 멤버 커뮤니티 미리보기 */}
       <div className="mx-5 mt-5">
@@ -140,10 +143,10 @@ function MarketMain() {
         </div>
       </div>
 
-      {/* 참여 점포 미리보기 */}
+      {/* 참여 가게 미리보기 */}
       <div className="mx-5 mt-5">
         <div className="mb-2 flex items-end justify-between">
-          <div className="text-base font-semibold">참여 점포</div>
+          <div className="text-base font-semibold">참여 가게</div>
           <span className="text-xs text-brand-600">{storeList.length}개 참여 중</span>
         </div>
         <div className="flex flex-col gap-2">
@@ -475,6 +478,50 @@ export function MarketHome() {
   const [marketTab, setMarketTab] = useState<MarketTab>("main");
   const [feedTab, setFeedTab] = useState<FeedTab>("community");
   const [viewMode, setViewMode] = useState<ViewMode>("map");
+
+  // URL query(tab/feedTab/view)를 초기 상태와 동기화해 딥링크를 보장한다.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    const feed = params.get("feedTab");
+    const view = params.get("view");
+
+    if (tab === "main" || tab === "stores" || tab === "feed") {
+      setMarketTab(tab);
+    }
+    if (feed === "community" || feed === "dangol") {
+      setFeedTab(feed);
+    }
+    if (view === "list" || view === "map") {
+      setViewMode(view);
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", marketTab);
+
+    if (marketTab === "feed") {
+      params.set("feedTab", feedTab);
+      params.delete("view");
+    } else if (marketTab === "stores") {
+      params.set("view", viewMode);
+      params.delete("feedTab");
+    } else {
+      params.delete("feedTab");
+      params.delete("view");
+    }
+
+    const nextSearch = params.toString();
+    const currentSearch = window.location.search.startsWith("?")
+      ? window.location.search.slice(1)
+      : window.location.search;
+
+    if (nextSearch !== currentSearch) {
+      const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}`;
+      window.history.replaceState(null, "", nextUrl);
+    }
+  }, [feedTab, marketTab, viewMode]);
 
   const tabLabels: Record<MarketTab, string> = {
     main: "메인",

@@ -4,14 +4,28 @@ import { appIcons, storeIcons } from "../icons";
 import { useApp } from "../store";
 
 export function DangolFeed() {
-  const { go, openStore, openDangolPost } = useApp();
+  const { go, openStore, openDangolPost, storeNewsItems } = useApp();
   const TimeIcon = appIcons.clock;
   const stores = useMemo(() => storesByMarket("godeok-2dong"), []);
   const [selectedStoreId, setSelectedStoreId] = useState<string>("all");
 
-  const allNews = stores.flatMap((s) =>
-    s.dangolNews.map((n) => ({ store: s, news: n })),
-  );
+  const allNews = [
+    // dynamic news from store (newest first)
+    ...storeNewsItems.map((sn) => ({
+      store: stores.find((s) => s.id === sn.storeId) ?? {
+        id: sn.storeId,
+        name: sn.storeName,
+        icon: "store" as keyof typeof storeIcons,
+        gradient: "from-brand-200 to-brand-400",
+        dangolNews: [] as { id: string; title: string; body: string; timeAgo: string }[],
+      },
+      news: { id: sn.id, title: sn.title, body: sn.body, timeAgo: sn.minsAgo === 0 ? "방금 전" : `${sn.minsAgo}분 전` },
+    })),
+    // static seed news from data.ts
+    ...stores.flatMap((s) =>
+      s.dangolNews.map((n) => ({ store: s, news: n }))
+    ),
+  ];
 
   const filteredNews =
     selectedStoreId === "all"

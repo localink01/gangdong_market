@@ -46,6 +46,27 @@ export type Store = {
   dangolNews: DangolNews[];
 };
 
+export type RegionEventPublisherType = "region_official" | "market_official" | "store";
+
+export type RegionEvent = {
+  id: string;
+  regionSlug: string;
+  marketId: string;
+  storeId?: string;
+  publisherType: RegionEventPublisherType;
+  publisherName: string;
+  title: string;
+  summary: string;
+  category: "festival" | "coupon" | "night" | "family" | "market";
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  locationLabel: string;
+  audienceLabel: string;
+  highlight: string;
+};
+
 export const markets: Market[] = [
   {
     id: "godeok-2dong",
@@ -213,6 +234,97 @@ export const stores: Store[] = [
   },
 ];
 
+export const regionEvents: RegionEvent[] = [
+  {
+    id: "re1",
+    regionSlug: "gangdong-gu",
+    marketId: "godeok-2dong",
+    publisherType: "region_official",
+    publisherName: "강동 hero 운영사",
+    title: "강동 봄 골목 주간",
+    summary: "주말 동안 고덕2동 상권 4곳에서 순차 이벤트와 쿠폰 캠페인이 열립니다.",
+    category: "festival",
+    startDate: "2026-05-29",
+    endDate: "2026-05-31",
+    startTime: "11:00",
+    endTime: "20:00",
+    locationLabel: "고덕2동 골목형상점가 일대",
+    audienceLabel: "누구나 참여 가능",
+    highlight: "토요일 방문 추천",
+  },
+  {
+    id: "re2",
+    regionSlug: "gangdong-gu",
+    marketId: "godeok-2dong",
+    storeId: "godeok-bakery",
+    publisherType: "store",
+    publisherName: "고덕 베이커리",
+    title: "크루아상 1+1 타임 이벤트",
+    summary: "오후 3시 이후 선착순 40명 한정으로 크루아상 1+1을 제공합니다.",
+    category: "coupon",
+    startDate: "2026-05-29",
+    endDate: "2026-05-29",
+    startTime: "15:00",
+    endTime: "18:00",
+    locationLabel: "고덕 베이커리 매장 앞",
+    audienceLabel: "멤버 우선 참여",
+    highlight: "오늘 오후",
+  },
+  {
+    id: "re3",
+    regionSlug: "gangdong-gu",
+    marketId: "godeok-2dong",
+    storeId: "go-pub",
+    publisherType: "store",
+    publisherName: "GO PUB",
+    title: "월드컵 응원 야간 이벤트",
+    summary: "대형 스크린 응원전과 예약 세트 할인 행사가 함께 진행됩니다.",
+    category: "night",
+    startDate: "2026-05-30",
+    endDate: "2026-05-30",
+    startTime: "19:00",
+    endTime: "23:30",
+    locationLabel: "GO PUB 홀",
+    audienceLabel: "성인 방문객",
+    highlight: "금요일 밤 추천",
+  },
+  {
+    id: "re4",
+    regionSlug: "gangdong-gu",
+    marketId: "godeok-2dong",
+    storeId: "woori-farm",
+    publisherType: "store",
+    publisherName: "우리농산물",
+    title: "주말 제철 과일 시식회",
+    summary: "가족 단위 방문객을 위한 제철 과일 시식과 소포장 할인 행사가 열립니다.",
+    category: "family",
+    startDate: "2026-05-30",
+    endDate: "2026-05-31",
+    startTime: "10:00",
+    endTime: "16:00",
+    locationLabel: "우리농산물 앞 부스",
+    audienceLabel: "가족 방문객 추천",
+    highlight: "주말 낮 추천",
+  },
+  {
+    id: "re5",
+    regionSlug: "gangdong-gu",
+    marketId: "godeok-2dong",
+    publisherType: "market_official",
+    publisherName: "고덕2동 상인회",
+    title: "상점가 스탬프 없는 쿠폰 데이",
+    summary: "참여 가게를 돌며 현장 확인만으로 받을 수 있는 주말 쿠폰 데이입니다.",
+    category: "market",
+    startDate: "2026-05-31",
+    endDate: "2026-05-31",
+    startTime: "12:00",
+    endTime: "18:00",
+    locationLabel: "고덕2동 참여 가게 6곳",
+    audienceLabel: "멤버 대상",
+    highlight: "일요일 마감",
+  },
+];
+
 export const getRegion = (slug: string) => regions.find((r) => r.slug === slug);
 export const getStore = (id: string | null) => stores.find((s) => s.id === id);
 export const getMarket = (id: string) => markets.find((m) => m.id === id)!;
@@ -220,3 +332,5 @@ export const marketsByRegion = (regionSlug: string) =>
   markets.filter((m) => m.regionSlug === regionSlug);
 export const storesByMarket = (marketId: string) =>
   stores.filter((s) => s.marketId === marketId);
+export const eventsByRegion = (regionSlug: string) =>
+  regionEvents.filter((event) => event.regionSlug === regionSlug);

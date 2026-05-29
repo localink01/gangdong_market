@@ -25,7 +25,6 @@ function NotificationsScreen() {
   const { openStore } = useApp();
   const notifications = [
     { id: 1, type: "event", title: "봄맞이 이벤트 시작!", body: "고덕 베이커리 봄맞이 이벤트가 시작됐어요. 참여 혜택을 확인해보세요.", time: "방금 전", unread: true, storeId: "godeok-bakery" },
-    { id: 2, type: "stamp", title: "스탬프 2개 적립 완료", body: "럭키할인마트에서 스탬프가 적립됐어요. 10개 모으면 경품을 드려요!", time: "1시간 전", unread: true, storeId: "lucky-discount" },
     { id: 3, type: "dangol", title: "단골 가게 새 소식", body: "고덕 베이커리 단골 소식: '오늘 오후 3시 이후 크루아상 1+1 진행'", time: "3시간 전", unread: false, storeId: "godeok-bakery" },
     { id: 4, type: "coupon", title: "쿠폰 만료 3일 전", body: "우리농산물 신규 가입 쿠폰이 3일 후 만료돼요. 지금 바로 사용해보세요.", time: "어제", unread: false, storeId: "woori-farm" },
     { id: 5, type: "event", title: "멤버 전용 할인 행사", body: "GO PUB 이번 주말 멤버 전용 10% 할인 행사가 진행돼요.", time: "2일 전", unread: false, storeId: "go-pub" },
@@ -33,7 +32,6 @@ function NotificationsScreen() {
 
   const typeIcon: Record<string, string> = {
     event: "🎉",
-    stamp: "🔖",
     dangol: "⭐",
     coupon: "🎫",
   };
@@ -191,8 +189,8 @@ const scenarios: Scenario[] = [
     id: "s08",
     group: "주민",
     no: "S-08",
-    title: "혜택 (스탬프투어 + 쿠폰)",
-    desc: "스탬툤판 + 쿠폰함",
+    title: "혜택 (쿠폰)",
+    desc: "멤버 전용 쿠폰함",
     run: (c) => c.go("benefits"),
   },
   {

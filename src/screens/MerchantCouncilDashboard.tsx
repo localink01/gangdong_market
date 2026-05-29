@@ -1,7 +1,7 @@
 export function MerchantCouncilDashboard() {
   const kpis = [
     { label: "멤버십", value: "127", unit: "명" },
-    { label: "참여 점포", value: "18", unit: "곳" },
+    { label: "참여 가게", value: "18", unit: "곳" },
     { label: "이벤트 참여율", value: "62", unit: "%" },
   ];
 
@@ -37,7 +37,7 @@ export function MerchantCouncilDashboard() {
             쿠폰 발행
           </button>
           <button className="rounded-2xl bg-white/80 px-3 py-3 text-sm font-semibold shadow-card">
-            참여 점포 관리
+            참여 가게 관리
           </button>
         </div>
       </div>
@@ -46,7 +46,7 @@ export function MerchantCouncilDashboard() {
         <div className="text-sm font-semibold">오늘 할 일</div>
         <ul className="mt-2 space-y-2 text-xs text-ink-600">
           <li>• 주말 공동 이벤트 배너 확정</li>
-          <li>• 미참여 점포 3곳 참여 안내</li>
+          <li>• 미참여 가게 3곳 참여 안내</li>
           <li>• 스탬프투어 2코스 공지 게시</li>
         </ul>
       </div>

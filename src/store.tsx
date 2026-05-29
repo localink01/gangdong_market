@@ -16,7 +16,7 @@ export type Screen =
   | "community"  // S-05 (호환성 유지)
   | "dangolFeed" // S-07 (호환성 유지)
   | "dangolPost" // S-07-1 단골 소식 상세
-  | "benefits"   // 혜택 탭 (스탬프투어 + 쿠폰함)
+  | "benefits"   // 혜택 탭 (쿠폰 중심)
   | "mypage"     // 마이페이지 탭
   | "notifications" // 알림
   | "merchantCouncilAdmin" // 상인회 대시보드
@@ -26,6 +26,7 @@ export type Screen =
 
 export type ToastMsg = { id: number; text: string };
 export type ChannelMode = "web" | "app";
+export type BenefitScope = "owned" | "available";
 
 const DEFAULT_REGION_SLUG =
   (import.meta.env.VITE_APP_REGION_SLUG as string | undefined) ?? "gangdong-gu";
@@ -139,6 +140,25 @@ function parseRoute(pathname: string): ParsedRoute {
   };
 }
 
+function isOutOfRegionRouteInAppMode(
+  route: ParsedRoute,
+  channelMode: ChannelMode,
+  appRegionSlug: string,
+) {
+  return channelMode === "app" && route.regionSlug !== appRegionSlug;
+}
+
+function resolveScreenForRoute(
+  route: ParsedRoute,
+  channelMode: ChannelMode,
+  appRegionSlug: string,
+): Screen {
+  if (isOutOfRegionRouteInAppMode(route, channelMode, appRegionSlug)) {
+    return "region";
+  }
+  return guardScreen(route.screen, channelMode);
+}
+
 function guardScreen(screen: Screen, channelMode: ChannelMode): Screen {
   if (channelMode === "app" && screen === "portal") {
     return "region";
@@ -161,6 +181,12 @@ function buildPathForScreen(
   activeStoreId: string | null,
 ) {
   const regionSlug = channelMode === "app" ? appRegionSlug : activeRegionSlug;
+  const buildBenefitsPath = (scope: BenefitScope = "owned", status: "active" | "expired" = "active") => {
+    const base = scope === "available"
+      ? "/benefits?tab=coupon&scope=available"
+      : `/benefits?tab=coupon&scope=owned&status=${status}`;
+    return withModeQuery(base, channelMode, appRegionSlug);
+  };
   switch (screen) {
     case "portal":
       return withModeQuery("/", channelMode, appRegionSlug);
@@ -207,7 +233,7 @@ function buildPathForScreen(
       );
     }
     case "benefits":
-      return withModeQuery("/benefits", channelMode, appRegionSlug);
+      return buildBenefitsPath();
     case "mypage":
       return withModeQuery("/me", channelMode, appRegionSlug);
     case "notifications":
@@ -256,8 +282,19 @@ export type CommunityPost = {
   comments: number;
 };
 
+export type StoreNewsItem = {
+  id: string;
+  storeId: string;
+  storeName: string;
+  title: string;
+  body: string;
+  minsAgo: number;
+  isNew: boolean;
+};
+
 type Ctx = State & {
   go: (s: Screen) => void;
+  goToBenefits: (scope?: BenefitScope, status?: "active" | "expired") => void;
   setChannelMode: (mode: ChannelMode) => void;
   enterRegion: (regionSlug: string) => void;
   enterMarket: (regionSlug: string, marketSlug?: string) => void;
@@ -271,6 +308,9 @@ type Ctx = State & {
   closeDangol: () => void;
   confirmDangol: () => void;
   sendAdminBroadcast: (title: string, body: string, alsoFeed: boolean) => void;
+  addCommunityPost: (body: string, category: CommunityPost["category"]) => void;
+  addStoreNews: (storeId: string, storeName: string, title: string, body: string) => void;
+  storeNewsItems: StoreNewsItem[];
   toast: (text: string) => void;
   trackEvent: (eventName: string, metadata?: Record<string, unknown>) => void;
 };
@@ -314,17 +354,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const initialChannelMode = detectChannelMode();
   const initialAppRegionSlug = detectAppRegionSlug();
   const initialRoute = parseRoute(window.location.pathname);
+  const shouldForceRegionOnEntry = isOutOfRegionRouteInAppMode(
+    initialRoute,
+    initialChannelMode,
+    initialAppRegionSlug,
+  );
   const initialRegionSlug =
     initialChannelMode === "app" ? initialAppRegionSlug : initialRoute.regionSlug;
-  const isOutOfRegionAppEntry =
-    initialChannelMode === "app" && initialRoute.regionSlug !== initialAppRegionSlug;
+  const isOutOfRegionAppEntry = shouldForceRegionOnEntry;
 
   const [channelMode, setChannelModeState] = useState<ChannelMode>(initialChannelMode);
   const [appRegionSlug] = useState(initialAppRegionSlug);
   const [activeRegionSlug, setActiveRegionSlug] = useState(initialRegionSlug);
-  const [activeMarketSlug, setActiveMarketSlug] = useState(initialRoute.marketSlug);
+  const [activeMarketSlug, setActiveMarketSlug] = useState(
+    shouldForceRegionOnEntry ? DEFAULT_MARKET_SLUG : initialRoute.marketSlug,
+  );
   const [screen, setScreen] = useState<Screen>(
-    guardScreen(initialRoute.screen, initialChannelMode),
+    resolveScreenForRoute(initialRoute, initialChannelMode, initialAppRegionSlug),
   );
   const [history, setHistory] = useState<Screen[]>([]);
   const [isMember, setIsMember] = useState(false);
@@ -339,6 +385,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [dangolTargetStoreId, setDangolTargetStoreId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(seedPosts);
+  const [storeNewsItems, setStoreNewsItems] = useState<StoreNewsItem[]>([]);
 
   const trackEvent = (
     eventName: string,
@@ -392,11 +439,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const normalizedScreen = guardScreen(initialRoute.screen, initialChannelMode);
+    const normalizedScreen = resolveScreenForRoute(
+      initialRoute,
+      initialChannelMode,
+      initialAppRegionSlug,
+    );
     syncPath(normalizedScreen, true, {
       channelMode: initialChannelMode,
       regionSlug: initialRegionSlug,
-      marketSlug: initialRoute.marketSlug,
+      marketSlug: shouldForceRegionOnEntry ? DEFAULT_MARKET_SLUG : initialRoute.marketSlug,
       storeId: initialRoute.storeId,
     });
     if (isOutOfRegionAppEntry) {
@@ -408,6 +459,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // mount normalize only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const onPopState = () => {
+      const route = parseRoute(window.location.pathname);
+      const nextScreen = resolveScreenForRoute(route, channelMode, appRegionSlug);
+      const nextRegionSlug = channelMode === "app" ? appRegionSlug : route.regionSlug;
+      const nextMarketSlug =
+        isOutOfRegionRouteInAppMode(route, channelMode, appRegionSlug)
+          ? DEFAULT_MARKET_SLUG
+          : route.marketSlug;
+
+      setActiveRegionSlug(nextRegionSlug);
+      setActiveMarketSlug(nextMarketSlug);
+      setActiveStoreId(route.storeId);
+      setScreen(nextScreen);
+
+      if (isOutOfRegionRouteInAppMode(route, channelMode, appRegionSlug)) {
+        syncPath("region", true, {
+          channelMode,
+          regionSlug: appRegionSlug,
+          marketSlug: DEFAULT_MARKET_SLUG,
+          storeId: null,
+        });
+        trackEvent("app_out_of_region_blocked", {
+          attempted_region_slug: route.regionSlug,
+          redirected_region_slug: appRegionSlug,
+          source: "popstate",
+        }, "app");
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+    // keep listener in sync with channel/app region policy
+  }, [appRegionSlug, channelMode]);
 
   const navigate = (
     nextScreen: Screen,
@@ -437,6 +523,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     navigate(next);
     if (next === "region") {
       trackEvent(makeEventName(channelMode, "region_entered"));
+    }
+  };
+
+  const goToBenefits = (
+    scope: BenefitScope = "owned",
+    status: "active" | "expired" = "active",
+  ) => {
+    setHistory((h) => [...h, screen]);
+    setScreen("benefits");
+    const nextPath =
+      scope === "available"
+        ? withModeQuery("/benefits?tab=coupon&scope=available", channelMode, appRegionSlug)
+        : withModeQuery(
+            `/benefits?tab=coupon&scope=owned&status=${status}`,
+            channelMode,
+            appRegionSlug,
+          );
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (nextPath !== current) {
+      window.history.pushState(null, "", nextPath);
     }
   };
 
@@ -538,6 +644,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toast("단골이 되었어요");
   };
 
+  const addCommunityPost = (body: string, category: CommunityPost["category"]) => {
+    setCommunityPosts((posts) => [
+      {
+        id: `p${Date.now()}`,
+        author: "나",
+        badge: null,
+        category,
+        body,
+        minsAgo: 0,
+        likes: 0,
+        comments: 0,
+      },
+      ...posts,
+    ]);
+    trackEvent(makeEventName(channelMode, "community_post_created"), { category });
+    toast("게시물을 올렸어요");
+  };
+
+  const addStoreNews = (
+    storeId: string,
+    storeName: string,
+    title: string,
+    body: string,
+  ) => {
+    setStoreNewsItems((items) => [
+      {
+        id: `sn${Date.now()}`,
+        storeId,
+        storeName,
+        title,
+        body,
+        minsAgo: 0,
+        isNew: true,
+      },
+      ...items,
+    ]);
+    trackEvent(makeEventName(channelMode, "store_news_published"), { store_id: storeId });
+    toast("단골 소식을 발행했어요");
+  };
+
   const sendAdminBroadcast = (title: string, body: string, alsoFeed: boolean) => {
     toast(`${title} — 127명에게 발송되었습니다`);
     if (alsoFeed) {
@@ -577,7 +723,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       dangolTargetStoreId,
       toasts,
       communityPosts,
+      storeNewsItems,
       go,
+      goToBenefits,
       setChannelMode,
       enterRegion,
       enterMarket,
@@ -591,6 +739,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       closeDangol,
       confirmDangol,
       sendAdminBroadcast,
+      addCommunityPost,
+      addStoreNews,
       toast,
       trackEvent,
     }),
@@ -611,6 +761,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       dangolTargetStoreId,
       toasts,
       communityPosts,
+      storeNewsItems,
     ],
   );
 
