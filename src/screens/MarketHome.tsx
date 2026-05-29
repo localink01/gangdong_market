@@ -10,7 +10,7 @@ const ENABLE_STAMP_TOUR = false;
 
 /* ── 메인 탭 ─────────────────────────────────────────── */
 function MarketMain() {
-  const { isMember, openMembership, go, openStore, communityPosts, activeMarketSlug } = useApp();
+  const { isMember, openMembership, goToBenefits, go, openStore, communityPosts, activeMarketSlug } = useApp();
   const market = getMarket(activeMarketSlug);
   const storeList = storesByMarket(market.id);
   const MarketIcon = marketIcons[market.icon];
@@ -69,11 +69,12 @@ function MarketMain() {
           <div className="mt-0.5 text-base font-bold">골목 봄 축제 쿠폰 발행 중</div>
           <div className="mt-0.5 text-sm text-ink-600">멤버 한정 참여 · 4월 26일까지</div>
           <button
-            onClick={() => isMember ? go("benefits") : openMembership()}
+            onClick={() => (isMember ? goToBenefits("available") : openMembership())}
             className="mt-3 rounded-full bg-ink-900 px-3 py-1.5 text-xs font-semibold text-white"
           >
-            {isMember ? "혜택 탭에서 쿠폰 받기 →" : "멤버십 등록 후 참여 →"}
+            {isMember ? "쿠폰 확인하기 →" : "멤버십 등록 후 참여 →"}
           </button>
+          {isMember && <div className="mt-1 text-[11px] text-ink-600">마이 {">"} 내 혜택에서 확인 가능</div>}
         </div>
       </div>
 
@@ -95,10 +96,10 @@ function MarketMain() {
             </div>
             <div className="mt-1 text-xs text-ink-500">2/10 완료 · 완주 시 아메리카노 쿠폰</div>
             <button
-              onClick={() => go("benefits")}
+              onClick={() => goToBenefits("owned", "active")}
               className="mt-2 text-xs font-semibold text-brand-600"
             >
-              혜택 탭에서 계속하기 →
+              내 혜택에서 계속하기 →
             </button>
           </div>
         </div>

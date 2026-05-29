@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppProvider, useApp, type Screen } from "./store";
 import { PhoneFrame } from "./components/PhoneFrame";
 import { TabBar } from "./components/TabBar";
@@ -21,6 +22,7 @@ import { DistrictDashboard } from "./screens/DistrictDashboard";
 import { StoreAdminDashboard } from "./screens/StoreAdminDashboard";
 import { getMarket } from "./data";
 import { appIcons } from "./icons";
+import { MarketSwitchSheet } from "./components/MarketSwitchSheet";
 
 function NotificationsScreen() {
   const { openStore } = useApp();
@@ -125,7 +127,8 @@ function ScreenBody() {
 }
 
 function AppShell() {
-  const { screen, activeMarketSlug, go } = useApp();
+  const { screen, activeMarketSlug } = useApp();
+  const [marketSwitchOpen, setMarketSwitchOpen] = useState(false);
   const showHeader = !NO_HEADER_SCREENS.includes(screen);
   const showTabBar = screen !== "notifications" && screen !== "portal";
   const showMarketChip = MARKET_CHIP_SCREENS.includes(screen) && !!activeMarketSlug;
@@ -136,7 +139,7 @@ function AppShell() {
         <AppHeader
           title={HEADER_TITLES[screen]}
           marketName={marketName}
-          onChangeMarket={() => go("region")}
+          onChangeMarket={() => setMarketSwitchOpen(true)}
         />
       )}
       <div className="relative min-h-0 flex-1">
@@ -148,6 +151,10 @@ function AppShell() {
       <ToastStack />
       <MembershipSheet />
       <DangolSheet />
+      <MarketSwitchSheet
+        open={marketSwitchOpen}
+        onClose={() => setMarketSwitchOpen(false)}
+      />
     </PhoneFrame>
   );
 }

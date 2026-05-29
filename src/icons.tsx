@@ -37,9 +37,9 @@ export type StoreIconKey = keyof typeof storeIcons;
 
 export const appIcons = {
   // 하단 탭 4개 전용 아이콘
-  home: HomeIcon,        // 포털 탭
-  reader: ReaderIcon,    // 상점가 탭
-  benefit: BackpackIcon, // 혜택 탭
+  home: HomeIcon,        // 홈 탭
+  reader: ReaderIcon,    // 가게 탭
+  benefit: BackpackIcon, // 내 혜택/쿠폰 아이콘
   person: PersonIcon,    // 마이페이지 탭
   // 기능 아이콘
   explore: MagnifyingGlassIcon,

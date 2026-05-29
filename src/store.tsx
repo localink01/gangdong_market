@@ -10,13 +10,13 @@ import {
 export type Screen =
   | "portal"     // G-00 전체 포털
   | "region"     // M-00 지자체 포털
-  | "market"     // MK-00 상권 포털
+  | "market"     // MK-00 상권 홈
   | "stores"     // S-02-1 참여 상점 (호환성 유지)
   | "store"      // S-03
   | "community"  // S-05 (호환성 유지)
   | "dangolFeed" // S-07 (호환성 유지)
   | "dangolPost" // S-07-1 단골 소식 상세
-  | "benefits"   // 혜택 탭 (쿠폰 중심)
+  | "benefits"   // 내 혜택 화면 (쿠폰 중심)
   | "mypage"     // 마이페이지 탭
   | "notifications" // 알림
   | "merchantCouncilAdmin" // 상인회 대시보드
